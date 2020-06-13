@@ -3,8 +3,8 @@ name = "tauri-async-handler"
 description = "A async handler for tauri"
 license = "MIT"
 documentation = "https://docs.rs/tauri-async-handler"
-repositiory = "https://github.com/spacemeowx2/tauri-async-handler"
-version = "0.1.0"
+repository = "https://github.com/spacemeowx2/tauri-async-handler"
+version = "0.1.1"
 authors = ["spacemeowx2 <spacemeowx2@gmail.com>"]
 edition = "2018"
 
