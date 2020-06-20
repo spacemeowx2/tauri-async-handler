@@ -72,12 +72,7 @@ struct CallbackCmd<T> {
 struct Command<T>(T, Handle<()>);
 
 pub trait AppBuilderExt {
-    fn async_handler<C, F, Fut>(self, invoke_handler: F) -> Self
-    where
-        C: serde::de::DeserializeOwned + Send + 'static,
-        F: FnMut(C) -> Fut + Send + 'static,
-        Fut: std::future::Future<Output = Result<Value>> + Send;
-    fn async_handler_concurrent<C, F, Fut>(self, limit: impl Into<Option<usize>>, invoke_handler: F) -> Self
+    fn async_handler<C, F, Fut>(self, limit: impl Into<Option<usize>>, invoke_handler: F) -> Self
     where
         C: serde::de::DeserializeOwned + Send + 'static,
         F: FnMut(C) -> Fut + Send + 'static,
@@ -102,22 +97,14 @@ fn execute_callback(handle: Handle<()>, result: Result<Value>, callback: String,
 }
 
 impl AppBuilderExt for AppBuilder {
-    fn async_handler<C, F, Fut>(self, invoke_handler: F) -> Self
-    where
-        C: serde::de::DeserializeOwned + Send + 'static,
-        F: FnMut(C) -> Fut + Send + 'static,
-        Fut: std::future::Future<Output = Result<Value>> + Send,
-    {
-        self.async_handler_concurrent(1, invoke_handler)
-    }
-    fn async_handler_concurrent<C, F, Fut>(self, limit: impl Into<Option<usize>>, mut invoke_handler: F) -> Self
+    fn async_handler<C, F, Fut>(self, limit: impl Into<Option<usize>>, mut invoke_handler: F) -> Self
     where
         C: serde::de::DeserializeOwned + Send + 'static,
         F: FnMut(C) -> Fut + Send + 'static,
         Fut: std::future::Future<Output = Result<Value>> + Send
     {
         let limit = limit.into();
-        let (mut tx, rx) = mpsc::channel::<Command<CallbackCmd<C>>>(1);
+        let (mut tx, rx) = mpsc::channel::<Command<CallbackCmd<C>>>(10);
 
         spawn(async move {
             rx.for_each_concurrent(limit, move |command| {
@@ -144,13 +131,5 @@ impl AppBuilderExt for AppBuilder {
             }
             Ok(())
         })
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn it_works() {
-        assert_eq!(2 + 2, 4);
     }
 }
