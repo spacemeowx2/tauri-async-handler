@@ -19,7 +19,7 @@ use tauri_async_handler::*;
 
 fn main() {
   tauri::AppBuilder::new()
-    .async_handler(|cmd: cmd::Cmd| async {
+    .async_handler(None, |cmd: cmd::Cmd| async {
       use cmd::Cmd::*;
       Ok(match cmd {
         MyCustomCommand{ argument } => {
