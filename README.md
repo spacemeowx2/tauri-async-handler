@@ -1,5 +1,7 @@
 # tauri-async-handler
 
+**Deprecated.** tauri now comes with its own asynchronous runtime.
+
 ## Usage
 
 Cargo.toml:
